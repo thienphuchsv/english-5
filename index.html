@@ -1,0 +1,551 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Trắc nghiệm Tiếng Anh Lớp 5</title>
+  <style>
+    :root{
+      --bg1:#7ad7ff;
+      --bg2:#ffe58a;
+      --bg3:#d3f4ff;
+      --card:#ffffff;
+      --text:#1f2d4d;
+      --muted:#5c6b82;
+      --blue:#4aa8ff;
+      --pink:#ff7db8;
+      --yellow:#ffd166;
+      --green:#4ecdc4;
+      --red:#ff6b6b;
+      --purple:#9b8cff;
+      --shadow:0 18px 40px rgba(30, 60, 120, 0.16);
+    }
+
+    *{box-sizing:border-box;}
+    html, body{
+      margin:0;
+      font-family: "Segoe UI", Arial, sans-serif;
+      background: linear-gradient(180deg, var(--bg1), var(--bg3), var(--bg2));
+      min-height:100vh;
+      color:var(--text);
+    }
+
+    body{
+      display:flex;
+      justify-content:center;
+      padding:32px 18px;
+      position:relative;
+      overflow-x:hidden;
+    }
+
+    .cloud{
+      position:absolute;
+      background:rgba(255,255,255,0.9);
+      border-radius:999px;
+      box-shadow: 30px 10px 0 rgba(255,255,255,0.8), 60px 18px 0 rgba(255,255,255,0.75);
+      opacity:0.8;
+    }
+    .cloud1{ width:150px; height:48px; top:40px; left:10%; animation: float1 10s ease-in-out infinite; }
+    .cloud2{ width:180px; height:56px; top:120px; right:12%; animation: float2 12s ease-in-out infinite; }
+    .cloud3{ width:120px; height:40px; bottom:170px; left:15%; animation: float3 11s ease-in-out infinite; }
+
+    @keyframes float1{
+      0%,100%{transform:translateX(0);}
+      50%{transform:translateX(18px);}
+    }
+    @keyframes float2{
+      0%,100%{transform:translateX(0);}
+      50%{transform:translateX(-16px);}
+    }
+    @keyframes float3{
+      0%,100%{transform:translateY(0);}
+      50%{transform:translateY(12px);}
+    }
+
+    .app{
+      width:min(980px, 100%);
+      position:relative;
+      z-index:1;
+    }
+
+    .header-bar{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      flex-wrap:wrap;
+      gap:12px;
+      margin-bottom:20px;
+      padding:0 6px;
+    }
+
+    .badge{
+      background:rgba(255,255,255,0.8);
+      border:3px solid rgba(74,168,255,0.18);
+      color:#0f5ea8;
+      font-weight:800;
+      border-radius:999px;
+      padding:10px 18px;
+      box-shadow:0 8px 18px rgba(74,168,255,0.08);
+    }
+
+    .score-pill{
+      background:#fff4cc;
+      color:#b76b00;
+      font-weight:800;
+      border-radius:999px;
+      padding:10px 18px;
+      border:2px solid rgba(255,193,7,0.2);
+    }
+
+    .quiz-card{
+      background:rgba(255,255,255,0.8);
+      backdrop-filter: blur(4px);
+      border-radius:32px;
+      box-shadow:var(--shadow);
+      padding:28px 24px 24px;
+      border:3px solid rgba(255,255,255,0.5);
+      position:relative;
+      overflow:hidden;
+    }
+
+    .quiz-card::before{
+      content:"";
+      position:absolute;
+      width:220px;height:220px;
+      right:-60px; top:-60px;
+      background:radial-gradient(circle, rgba(255,125,184,0.18), transparent 68%);
+      border-radius:50%;
+    }
+    .quiz-card::after{
+      content:"";
+      position:absolute;
+      width:230px;height:230px;
+      left:-70px; bottom:-80px;
+      background:radial-gradient(circle, rgba(74,168,255,0.18), transparent 70%);
+      border-radius:50%;
+    }
+
+    .title{
+      position:relative;
+      z-index:1;
+      text-align:center;
+      font-size:clamp(30px, 4vw, 52px);
+      margin:8px 0 18px;
+      color:#123a62;
+      font-weight:900;
+      letter-spacing:0.5px;
+    }
+
+    .title span{
+      display:inline-block;
+      animation: bounceTitle 2s ease-in-out infinite;
+    }
+    @keyframes bounceTitle{
+      0%,100%{transform:translateY(0);}
+      50%{transform:translateY(-7px);}
+    }
+
+    .screen{
+      position:relative;
+      z-index:1;
+      display:none;
+    }
+    .screen.active{
+      display:block;
+    }
+
+    .question-box{
+      background:linear-gradient(180deg, #ffffff, #f8fbff);
+      border-radius:26px;
+      border:2px solid rgba(74,168,255,0.15);
+      padding:18px 18px 10px;
+      margin-top:6px;
+    }
+
+    .question-top{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      gap:12px;
+      margin-bottom:10px;
+      flex-wrap:wrap;
+    }
+
+    .question-number{
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      background:linear-gradient(135deg, #ffbf69, #ff8a65);
+      color:white;
+      font-weight:800;
+      border-radius:999px;
+      padding:8px 14px;
+      font-size:14px;
+    }
+
+    .progress-wrap{
+      width:240px;
+      max-width:100%;
+      height:14px;
+      background:#eaf4ff;
+      border-radius:999px;
+      overflow:hidden;
+      border:1px solid rgba(74,168,255,0.15);
+    }
+
+    .progress{
+      height:100%;
+      width:0%;
+      border-radius:999px;
+      background:linear-gradient(90deg, #4ecdc4, #58a6ff, #7d8fff);
+      transition:width 0.3s ease;
+    }
+
+    .question{
+      font-size:clamp(22px, 2.4vw, 34px);
+      font-weight:800;
+      line-height:1.5;
+      margin:18px 0 12px;
+      color:#1d3557;
+    }
+
+    .answers{
+      display:grid;
+      gap:14px;
+      margin-top:12px;
+    }
+
+    .answer{
+      width:100%;
+      border:none;
+      background:#f3f9ff;
+      border:2px solid #dfeeff;
+      border-radius:18px;
+      color:var(--text);
+      text-align:left;
+      padding:16px 18px;
+      font-size:20px;
+      font-weight:600;
+      display:flex;
+      align-items:center;
+      gap:12px;
+      cursor:pointer;
+      transition:0.2s ease;
+      box-shadow:0 6px 16px rgba(74,168,255,0.05);
+    }
+    .answer:hover{
+      transform:translateY(-2px);
+      box-shadow:0 10px 20px rgba(74,168,255,0.12);
+      border-color:#9ccfff;
+    }
+
+    .letter{
+      width:38px; height:38px;
+      border-radius:12px;
+      background:linear-gradient(135deg, #d4ecff, #bce0ff);
+      color:#0f5fae;
+      display:grid;
+      place-items:center;
+      font-size:18px;
+      font-weight:900;
+      flex-shrink:0;
+    }
+
+    .answer.selected{
+      background:#eaf6ff;
+      border-color:#3fa1ff;
+      box-shadow:0 12px 18px rgba(63,161,255,0.12);
+    }
+
+    .answer.correct{
+      background:#eafaf2;
+      border-color:#2ccf76;
+    }
+
+    .answer.incorrect{
+      background:#fff0f0;
+      border-color:#ff6b6b;
+    }
+
+    .answer.correct .letter{
+      background:linear-gradient(135deg, #40d98d, #2ec98d);
+      color:#fff;
+    }
+
+    .answer.incorrect .letter{
+      background:linear-gradient(135deg, #ff7d7d, #ff5d5d);
+      color:#fff;
+    }
+
+    .nav{
+      display:flex;
+      justify-content:center;
+      gap:12px;
+      margin-top:22px;
+      flex-wrap:wrap;
+    }
+
+    .btn{
+      border:none;
+      border-radius:16px;
+      padding:16px 22px;
+      cursor:pointer;
+      font-weight:800;
+      font-size:18px;
+      transition:0.2s ease;
+    }
+
+    .btn:hover{
+      transform:translateY(-2px);
+    }
+
+    .btn.primary{
+      background:linear-gradient(135deg, #ff7a59, #ff5e88);
+      color:white;
+      box-shadow:0 12px 24px rgba(255, 98, 126, 0.25);
+    }
+
+    .btn.secondary{
+      background:#eaf4ff;
+      color:#0f5fae;
+      border:2px solid #d9ebff;
+    }
+
+    .result-box{
+      display:none;
+      text-align:center;
+      padding:20px 16px 8px;
+      position:relative;
+      z-index:1;
+    }
+
+    .result-box.active{
+      display:block;
+    }
+
+    .emoji{
+      font-size:52px;
+      animation: wiggle 1.2s ease-in-out infinite;
+      margin-bottom:8px;
+    }
+    @keyframes wiggle{
+      0%,100% {transform:rotate(0deg) scale(1);}
+      25% {transform:rotate(-7deg) scale(1.06);}
+      75% {transform:rotate(7deg) scale(1.06);}
+    }
+
+    .result-title{
+      font-size:clamp(28px, 4vw, 42px);
+      font-weight:900;
+      color:#123a62;
+      margin:8px 0;
+    }
+
+    .score-big{
+      font-size:clamp(46px, 7vw, 82px);
+      font-weight:900;
+      color:#ff7a59;
+      margin:10px 0;
+      text-shadow:0 8px 18px rgba(255,122,89,0.18);
+    }
+
+    .result-message{
+      font-size:20px;
+      color:var(--muted);
+      margin-bottom:18px;
+    }
+
+    .gift-box{
+      background:linear-gradient(135deg, #fff7d8, #fff1b8);
+      border:2px dashed #f6c65b;
+      border-radius:18px;
+      color:#8a5c00;
+      font-weight:700;
+      padding:12px 14px;
+      width:max-content;
+      max-width:100%;
+      margin:10px auto 18px;
+    }
+
+    @media (max-width: 640px){
+      .quiz-card{padding:20px 14px 18px;}
+      .answers{gap:12px;}
+      .answer{font-size:17px; padding:14px 14px;}
+      .nav{flex-direction:column;}
+      .btn{width:100%;}
+      .progress-wrap{width:100%;}
+    }
+  </style>
+</head>
+<body>
+  <div class="cloud cloud1"></div>
+  <div class="cloud cloud2"></div>
+  <div class="cloud cloud3"></div>
+
+  <div class="app">
+    <div class="header-bar">
+      <div class="badge">🎓 Tiếng Anh Lớp 5</div>
+      <div class="score-pill">Điểm: <span id="scoreDisplay">0</span></div>
+    </div>
+
+    <div class="quiz-card">
+      <h1 class="title"><span>🌈</span> Trắc nghiệm vui nhộn <span>🌞</span></h1>
+
+      <div id="quizScreen" class="screen active"></div>
+
+      <div id="resultBox" class="result-box">
+        <div class="emoji">🎉</div>
+        <div class="result-title">Kết quả</div>
+        <div class="score-big" id="finalScore">0/20</div>
+        <div class="result-message" id="resultText">Bạn làm rất tốt!</div>
+        <div class="gift-box" id="giftBox">Chúc mừng bạn đã hoàn thành bài làm!</div>
+        <div class="nav">
+          <button class="btn primary" onclick="restartQuiz()">Làm lại</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const questions = [
+      { q: "What is the color of the sky?", options: ["Red", "Blue", "Green", "Yellow"], answer: 1 },
+      { q: "My mother is a ______.", options: ["teacher", "book", "chair", "pen"], answer: 0 },
+      { q: "I _____ to school every day.", options: ["go", "goes", "going", "gone"], answer: 0 },
+      { q: "Which one is an animal?", options: ["Table", "Cat", "Pencil", "Window"], answer: 1 },
+      { q: "The opposite of “big” is:", options: ["tall", "small", "strong", "fast"], answer: 1 },
+      { q: "How many days are there in a week?", options: ["5", "6", "7", "8"], answer: 2 },
+      { q: "She _____ a book now.", options: ["read", "reads", "is reading", "reading"], answer: 2 },
+      { q: "What do you drink when you are thirsty?", options: ["Water", "Chair", "Ball", "Book"], answer: 0 },
+      { q: "This is my _____.", options: ["friend", "friend’s", "friends", "friends’"], answer: 1 },
+      { q: "The sun rises in the _____.", options: ["evening", "morning", "night", "afternoon"], answer: 1 },
+      { q: "Choose the correct sentence:", options: ["I am happy.", "I happy.", "I is happy.", "I are happy."], answer: 0 },
+      { q: "A dog barks and a cat ____.", options: ["sings", "meows", "roars", "quacks"], answer: 1 },
+      { q: "Which one is a fruit?", options: ["Carrot", "Banana", "Onion", "Potato"], answer: 1 },
+      { q: "We use a _____ to write.", options: ["ruler", "pencil", "bag", "desk"], answer: 1 },
+      { q: "_____ is your name?", options: ["What", "Where", "Who", "How"], answer: 0 },
+      { q: "The children are playing _____ the park.", options: ["in", "on", "at", "of"], answer: 2 },
+      { q: "My father likes to _____ football.", options: ["play", "playing", "played", "plays"], answer: 0 },
+      { q: "A chicken lays _____.", options: ["milk", "eggs", "honey", "juice"], answer: 1 },
+      { q: "I have two _____.", options: ["book", "books", "bookes", "books’"], answer: 1 },
+      { q: "Which sentence is correct?", options: ["She go to school.", "She goes to school.", "She going to school.", "She gone to school."], answer: 1 }
+    ];
+
+    let current = 0;
+    let score = 0;
+    let selected = Array(questions.length).fill(null);
+
+    const quizScreen = document.getElementById("quizScreen");
+    const scoreDisplay = document.getElementById("scoreDisplay");
+    const resultBox = document.getElementById("resultBox");
+    const finalScore = document.getElementById("finalScore");
+    const resultText = document.getElementById("resultText");
+    const giftBox = document.getElementById("giftBox");
+
+    function renderQuestion() {
+      const q = questions[current];
+      const progress = ((current + 1) / questions.length) * 100;
+
+      quizScreen.innerHTML = `
+        <div class="question-box">
+          <div class="question-top">
+            <div class="question-number">❔ Câu ${current + 1}/${questions.length}</div>
+            <div class="progress-wrap">
+              <div class="progress" style="width:${progress}%"></div>
+            </div>
+          </div>
+
+          <div class="question">${q.q}</div>
+
+          <div class="answers">
+            ${q.options.map((option, i) => {
+              const isSelected = selected[current] === i;
+              return `
+                <button class="answer ${isSelected ? "selected" : ""}" data-index="${i}" onclick="chooseAnswer(${i})">
+                  <span class="letter">${String.fromCharCode(65 + i)}</span>
+                  <span>${option}</span>
+                </button>
+              `;
+            }).join("")}
+          </div>
+
+          <div class="nav">
+            <button class="btn secondary" ${current === 0 ? "disabled" : ""} onclick="prevQuestion()">⬅ Câu trước</button>
+            <button class="btn primary" onclick="nextQuestion()">${current === questions.length - 1 ? "Nộp bài ✅" : "Câu tiếp theo ➡"}</button>
+          </div>
+        </div>
+      `;
+
+      const allButtons = quizScreen.querySelectorAll(".answer");
+      allButtons.forEach(btn => {
+        btn.classList.toggle("selected", selected[current] === Number(btn.dataset.index));
+      });
+
+      scoreDisplay.textContent = score;
+      quizScreen.classList.add("active");
+      resultBox.classList.remove("active");
+    }
+
+    function chooseAnswer(index) {
+      selected[current] = index;
+      renderQuestion();
+    }
+
+    function prevQuestion() {
+      if (current > 0) {
+        current--;
+        renderQuestion();
+      }
+    }
+
+    function nextQuestion() {
+      if (selected[current] === null || selected[current] === undefined) {
+        alert("Bạn chưa chọn đáp án cho câu này nhé! ✨");
+        return;
+      }
+
+      if (current < questions.length - 1) {
+        current++;
+        renderQuestion();
+      } else {
+        finishQuiz();
+      }
+    }
+
+    function finishQuiz() {
+      score = 0;
+      questions.forEach((item, idx) => {
+        if (selected[idx] === item.answer) score++;
+      });
+
+      finalScore.textContent = `${score}/${questions.length}`;
+
+      if (score >= 16) {
+        resultText.textContent = "Tuyệt vời! Bạn là học sinh xuất sắc! 🌟";
+        giftBox.textContent = "Phần thưởng: Bạn đã đạt điểm tối ưu! 🏆";
+      } else if (score >= 12) {
+        resultText.textContent = "Rất tốt! Hãy tiếp tục cố gắng nhé! 👍";
+        giftBox.textContent = "Phần thưởng: Bạn đang tiến bộ rất tốt! 🚀";
+      } else if (score >= 8) {
+        resultText.textContent = "Khá tốt! Cứ luyện tập thêm là sẽ giỏi hơn! 😊";
+        giftBox.textContent = "Phần thưởng: Hãy ôn lại bài để tiến bộ hơn nữa! 🌱";
+      } else {
+        resultText.textContent = "Hãy ôn bài và làm lại nhé! 💪";
+        giftBox.textContent = "Phần thưởng: Mỗi lần làm lại đều giúp bạn học giỏi hơn! 🌼";
+      }
+
+      quizScreen.classList.remove("active");
+      resultBox.classList.add("active");
+      scoreDisplay.textContent = score;
+    }
+
+    function restartQuiz() {
+      current = 0;
+      score = 0;
+      selected = Array(questions.length).fill(null);
+      renderQuestion();
+    }
+
+    renderQuestion();
+  </script>
+</body>
+</html>
