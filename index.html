@@ -257,6 +257,11 @@
       box-shadow:0 12px 18px rgba(63,161,255,0.12);
     }
 
+      .answer:disabled{
+        cursor:default;
+        opacity:1;
+      }
+
     .answer.correct{
       background:#eafaf2;
       border-color:#2ccf76;
@@ -275,6 +280,22 @@
     .answer.incorrect .letter{
       background:linear-gradient(135deg, #ff7d7d, #ff5d5d);
       color:#fff;
+    }
+
+    .check-feedback{
+      min-height:32px;
+      margin-top:14px;
+      font-size:18px;
+      font-weight:800;
+      color:var(--muted);
+    }
+
+    .check-feedback.correct{
+      color:#159957;
+    }
+
+    .check-feedback.incorrect{
+      color:#d64545;
     }
 
     .nav{
@@ -433,6 +454,7 @@
     let current = 0;
     let score = 0;
     let selected = Array(questions.length).fill(null);
+    let checked = Array(questions.length).fill(false);
 
     const quizScreen = document.getElementById("quizScreen");
     const scoreDisplay = document.getElementById("scoreDisplay");
@@ -441,9 +463,17 @@
     const resultText = document.getElementById("resultText");
     const giftBox = document.getElementById("giftBox");
 
+    function calculateScore() {
+      return questions.reduce((total, item, idx) => {
+        return total + (checked[idx] && selected[idx] === item.answer ? 1 : 0);
+      }, 0);
+    }
+
     function renderQuestion() {
       const q = questions[current];
       const progress = ((current + 1) / questions.length) * 100;
+      const isChecked = checked[current];
+      const selectedAnswer = selected[current];
 
       quizScreen.innerHTML = `
         <div class="question-box">
@@ -458,9 +488,15 @@
 
           <div class="answers">
             ${q.options.map((option, i) => {
-              const isSelected = selected[current] === i;
+              const isSelected = selectedAnswer === i;
+              const answerClass = [
+                "answer",
+                isSelected ? "selected" : "",
+                isChecked && i === q.answer ? "correct" : "",
+                isChecked && isSelected && i !== q.answer ? "incorrect" : ""
+              ].filter(Boolean).join(" ");
               return `
-                <button class="answer ${isSelected ? "selected" : ""}" data-index="${i}" onclick="chooseAnswer(${i})">
+                <button class="${answerClass}" data-index="${i}" onclick="chooseAnswer(${i})" ${isChecked ? "disabled" : ""}>
                   <span class="letter">${String.fromCharCode(65 + i)}</span>
                   <span>${option}</span>
                 </button>
@@ -468,8 +504,17 @@
             }).join("")}
           </div>
 
+          <div class="check-feedback ${isChecked ? (selectedAnswer === q.answer ? "correct" : "incorrect") : ""}">
+            ${isChecked
+              ? (selectedAnswer === q.answer
+                  ? "Chính xác! Bạn chọn đúng đáp án."
+                  : `Chưa đúng. Đáp án đúng là ${String.fromCharCode(65 + q.answer)}.`)
+              : "Chọn đáp án rồi bấm Kiểm tra để xem đúng hay sai."}
+          </div>
+
           <div class="nav">
             <button class="btn secondary" ${current === 0 ? "disabled" : ""} onclick="prevQuestion()">⬅ Câu trước</button>
+            <button class="btn secondary" onclick="checkAnswer()" ${selectedAnswer === null || isChecked ? "disabled" : ""}>Kiểm tra đáp án</button>
             <button class="btn primary" onclick="nextQuestion()">${current === questions.length - 1 ? "Nộp bài ✅" : "Câu tiếp theo ➡"}</button>
           </div>
         </div>
@@ -486,7 +531,19 @@
     }
 
     function chooseAnswer(index) {
+      if (checked[current]) return;
       selected[current] = index;
+      renderQuestion();
+    }
+
+    function checkAnswer() {
+      if (selected[current] === null || selected[current] === undefined) {
+        alert("Bạn hãy chọn đáp án trước nhé! ✨");
+        return;
+      }
+
+      checked[current] = true;
+      score = calculateScore();
       renderQuestion();
     }
 
@@ -503,6 +560,11 @@
         return;
       }
 
+      if (!checked[current]) {
+        alert("Bạn hãy bấm 'Kiểm tra đáp án' trước khi sang câu tiếp theo nhé! ✨");
+        return;
+      }
+
       if (current < questions.length - 1) {
         current++;
         renderQuestion();
@@ -512,10 +574,7 @@
     }
 
     function finishQuiz() {
-      score = 0;
-      questions.forEach((item, idx) => {
-        if (selected[idx] === item.answer) score++;
-      });
+      score = calculateScore();
 
       finalScore.textContent = `${score}/${questions.length}`;
 
@@ -542,6 +601,7 @@
       current = 0;
       score = 0;
       selected = Array(questions.length).fill(null);
+      checked = Array(questions.length).fill(false);
       renderQuestion();
     }
 
